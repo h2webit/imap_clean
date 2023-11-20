@@ -14,10 +14,8 @@ If you prefer not to enter the password in the command line, omit `-p [password]
 This project is open-sourced under the [MIT License](LICENSE).
 
 ## Contributions
-Contributions, issues, and feature requests are welcome. Feel free to check [issues page](link-to-issues-page) if you want to contribute.
+Contributions, issues, and feature requests are welcome. 
 
-## Contact
-For any queries or further assistance, please contact [Your Name] at [Your Email].
 
 ## Acknowledgments
 - Thanks to all contributors who have helped in refining this script.
