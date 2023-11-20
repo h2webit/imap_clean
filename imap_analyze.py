@@ -70,7 +70,10 @@ def main(username, password, imap_url):
             if isinstance(response_part, tuple):
                 message = email.message_from_bytes(response_part[1])
                 email_from = message['from']
-                sender_count[email_from] += 1
+                email_from_str = str(email_from)
+                if email_from_str not in sender_count:
+                    sender_count[email_from_str] = 0
+                sender_count[email_from_str] += 1
 
         # Print the progress
         print(f"Processed {idx} of {total_emails} messages...", end='\r')
