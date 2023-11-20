@@ -4,6 +4,8 @@ from collections import Counter
 import getpass
 import argparse
 
+inbox_name_folder = 'inbox'
+
 def parse_folder(folder_info):
     # Split the folder information and return the parts
     parts = folder_info.decode().split(' ')
@@ -30,27 +32,27 @@ def main(username, password, imap_url):
 
     # Get the list of folders
     result, folders = mail.list()
-    if result == 'OK':
-        print("List of folders and number of messages in each:")
-        for folder in folders:
-            flags, delimiter, folder_name = parse_folder(folder)
-            print(f"Attempting to select folder: {folder_name}")
-            try:
-                folder_name_quoted = '"' + folder_name.replace('"', '\\"') + '"'
-                mail.select(f'"{folder_name_quoted}"', readonly=True)
-                result, data = mail.search(None, 'ALL')
-                if result == 'OK':
-                    num_messages = len(data[0].split())
-                    print(f"{folder_name}: {num_messages} messages")
-            except imaplib.IMAP4.error as e:
-                print(f"Error selecting folder {folder_name}: {e}")
-    else:
-        print("Unable to retrieve folder list.")
-        mail.logout()
-        exit()
+    # if result == 'OK':
+    #     print("List of folders and number of messages in each:")
+    #     for folder in folders:
+    #         flags, delimiter, folder_name = parse_folder(folder)
+    #         print(f"Attempting to select folder: {folder_name}")
+    #         try:
+    #             folder_name_quoted = '"' + folder_name.replace('"', '\\"') + '"'
+    #             mail.select(folder_name_quoted, readonly=True)
+    #             result, data = mail.search(None, 'ALL')
+    #             if result == 'OK':
+    #                 num_messages = len(data[0].split())
+    #                 print(f"{folder_name}: {num_messages} messages")
+    #         except imaplib.IMAP4.error as e:
+    #             print(f"Error selecting folder {folder_name}: {e}")
+    # else:
+    #     print("Unable to retrieve folder list.")
+    #     mail.logout()
+    #     exit()
 
     # Select the folder from which to count senders (e.g., 'inbox')
-    mail.select('inbox')
+    mail.select(inbox_name_folder)
 
     # Search for all messages
     result, data = mail.search(None, 'ALL')
