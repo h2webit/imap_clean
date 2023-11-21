@@ -12,6 +12,20 @@ def parse_folder(folder_info):
     parts = folder_info.decode().split(' ')
     return parts[0], parts[1], ' '.join(parts[2:]).strip('"')
 
+def choose_sender(filtered_senders):
+    while True:
+        print("\nChoose a sender to delete messages from (type 'exit' to quit):")
+        for idx, (sender, count) in enumerate(filtered_senders, start=1):
+            print(f"{idx}. {sender} ({count} messages)")
+
+        choice = input("Enter your choice (number): ").strip().lower()
+        if choice == 'exit':
+            return None
+        if choice.isdigit() and 1 <= int(choice) <= len(filtered_senders):
+            return filtered_senders[int(choice) - 1][0]  # Return the email address of the chosen sender
+        else:
+            print("Invalid choice, please try again.")
+
 def delete_messages_from_sender(mail, sender):
     # Select the folder (e.g., 'inbox')
     mail.select('inbox')
@@ -94,20 +108,17 @@ def main(username, password, imap_url, min_count=100):
     for sender, count in filtered_senders:
         print(f"Sender: {sender}, Number of messages: {count}")
 
-    # Message deletion process
+      # Message deletion process
     while True:
         if filtered_senders:
-            print("\nWhich sender's messages would you like to delete? (type 'exit' to quit)")
-            chosen_sender = input("Enter the email address of the sender: ")
-
-            if chosen_sender.lower() == 'exit':
+            chosen_sender = choose_sender(filtered_senders)
+            if chosen_sender is None:
                 break
 
-            # Check if the chosen sender is in the list
-            if any(chosen_sender in sender for sender, _ in filtered_senders):
-                delete_messages_from_sender(mail, chosen_sender)
-            else:
-                print("Sender not found in the list of frequent senders or unrecognized command.")
+            delete_messages_from_sender(mail, chosen_sender)
+
+            # Update filtered_senders list
+            filtered_senders = [item for item in filtered_senders if item[0] != chosen_sender]
         else:
             print("No sender with more than 100 messages found. Exiting.")
             break
