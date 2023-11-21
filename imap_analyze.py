@@ -6,6 +6,7 @@ import argparse
 
 inbox_name_folder = 'inbox'
 
+
 def parse_folder(folder_info):
     # Split the folder information and return the parts
     parts = folder_info.decode().split(' ')
@@ -25,11 +26,14 @@ def delete_messages_from_sender(mail, sender):
     else:
         print("No messages found for this sender.")
 
-def main(username, password, imap_url):
+def main(username, password, imap_url, min_count=100):
     # Connect to the IMAP server
     mail = imaplib.IMAP4_SSL(imap_url)
+
+    print(f"\nConnecting to IMAP...")
     mail.login(username, password)
 
+    print(f"\nConnected!")
     # Get the list of folders
     result, folders = mail.list()
     # if result == 'OK':
@@ -62,6 +66,8 @@ def main(username, password, imap_url):
     sender_count = Counter()
 
     total_emails = len(mail_ids)
+    print(f"\nStart checking...")
+    print(f"\nMin count email: {min_count}")
     print(f"\nTotal messages to process in 'inbox': {total_emails}")
 
     for idx, block in enumerate(mail_ids, 1):
@@ -80,7 +86,7 @@ def main(username, password, imap_url):
 
     # Filter and print senders with more than 100 messages
     print("\nSenders with more than 100 messages in 'inbox':")
-    filtered_senders = [item for item in sender_count.items() if item[1] > 100]
+    filtered_senders = [item for item in sender_count.items() if item[1] > min_count]
 
     # Sort the filtered senders by message count, in descending order
     filtered_senders.sort(key=lambda x: x[1], reverse=True)
@@ -114,10 +120,13 @@ if __name__ == "__main__":
     parser.add_argument("username", help="Email account username")
     parser.add_argument("server", help="IMAP server address")
     parser.add_argument("-p", "--password", help="Email account password", required=False)
-
+    parser.add_argument("min_count", help="Min. e-mail count for sender (default 100)")
     args = parser.parse_args()
 
     if args.password is None:
         args.password = getpass.getpass("Enter your password: ")
+    
+    if args.min_count:
+        args.min_count = int(args.min_count)
 
-    main(args.username, args.password, args.server)
+    main(args.username, args.password, args.server, args.min_count)
